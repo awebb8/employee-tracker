@@ -1,10 +1,11 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+const { resolve } = require("path");
 const connection = require("./config/connection.js");
 const orm = require("./config/orm.js");
 
-const jobTitles = [];
-const employeesArray = [];
+let jobTitles = ["HR Manager", "Accountant", "Director of Marketing", "Marketing Analyst", "Director of Engineering", "Product Engineer"];
+let employeesArray = [];
 
 function updateJobTitles() {
     connection.query(`SELECT title FROM role;`, (err, results) => {
@@ -20,15 +21,17 @@ function updateJobTitles() {
 }
 
 function updateEmployeesArray() {
-    connection.query(`SELECT CONCAT(first_name,'',last_name) FROM employee;`, (err, results) => {
+    connection.query(`SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM employee;`, (err, results) => {
         if (err) throw err;
+        employeesArray = [];
         for (let i = 0; i < results.length; i++) {
             const employees = {
-                name: results[i]
+                id: results[i].id,
+                name: results[i].full_name
             };
-            console.log(results[i]);
             employeesArray.push(employees);
         }
+        console.table(employeesArray)
     });
 }
 
@@ -56,6 +59,7 @@ function runEmployeeTracker() {
           "View all employees by department", 
           "View all employees by manager", 
           "Add an employee", 
+          "Remove an employee",
           "Update an employee's role", 
           "Update an employee's manager", 
           "View all roles"]
@@ -66,7 +70,7 @@ function runEmployeeTracker() {
             orm.viewAllEmployees();
             runEmployeeTracker();
         } else if (selection === "View all employees by department") {
-            orm.viewAllEmployeesByDepartment();
+            orm.viewEmployeesByDepartment();
             runEmployeeTracker();
         } else if (selection === "View all employees by manager") {
             orm.viewEmployeesByManager();
@@ -96,26 +100,32 @@ function runEmployeeTracker() {
                 type: "list",
                 choices: ["Timothy Williams", "Amber Smith", "Andrew Phillips", "Laurel Davis", "Joseph Johnson", "Jamie Miller"]
             }
-          ])
-          .then((response) => {
+          ]).then((response) => {
             // let roleID = orm.jobTitles.indexOf(response, title) + 1;
-            orm.addAnEmployee(response.firstName, response.lastName, response.role, response.manager, response.salary);
+            orm.addAnEmployee(response.firstName, response.lastName, response.role, response.manager);
             runEmployeeTracker();
-            })
-            // .catch ((err) => {
-            //     console.log (err)
-            // })
+            }) 
           
+        } else if (selection === "Remove an employee") {
+            updateEmployeesArray()
+            inquirer.prompt([
+                {
+                    name: "employee",
+                    message: "Which employee do you want to remove by ID?",
+                    type: "input",
+                },
+            ]).then((response) => {
+                orm.removeAnEmployee(response.employee);
+                runEmployeeTracker();
+                })
+
         } else if (selection === "Update an employee's role") {
-            updateJobTitles();
             updateEmployeesArray();
-            console.log(employeesArray);
             inquirer.prompt([
             {
                 name: "employee",
-                message: "Which employee's role do you want to update?",
-                type: "list",
-                choices: employeesArray
+                message: "Which employee would you like to update by ID?",
+                type: "input",
             },
             {
                 name: "role",
@@ -123,16 +133,32 @@ function runEmployeeTracker() {
                 type: "list",
                 choices: jobTitles
             }
-          ])
-          .then((response) => {
-            // let roleID = orm.jobTitles.indexOf(response, title) + 1;
-            orm.addAnEmployee(response.firstName, response.lastName, response.role, response.manager);
+          ]).then((response) => {
+            orm.updateAnEmployee(response.employee, response.role);
             runEmployeeTracker();
             })
-            // .catch ((err) => {
-            //     console.log (err)
-            // })
-          
+
+        } else if (selection === "Update an employee's manager") {
+            updateEmployeesArray();
+            inquirer.prompt([
+            {
+                name: "employee",
+                message: "Which employee's manager would you like to update by ID?",
+                type: "input",
+            },
+            {
+                name: "manager_id",
+                message: "What is the employee's manager's ID?",
+                type: "input"
+            }
+          ]).then((response) => {
+            orm.updateManager(response.employee, response.manager_id);
+            runEmployeeTracker();
+            })
+            
+        } else if (selection === "View all roles") {
+            orm.viewRoles();
+            runEmployeeTracker();
         }
     })
 }
