@@ -67,15 +67,19 @@ function runEmployeeTracker() {
     ]).then(({ selection }) => {
         console.log(selection);
         if (selection === "View all employees") {
+            console.clear();
             orm.viewAllEmployees();
             runEmployeeTracker();
         } else if (selection === "View all employees by department") {
+            console.clear();
             orm.viewEmployeesByDepartment();
             runEmployeeTracker();
         } else if (selection === "View all employees by manager") {
+            console.clear();
             orm.viewEmployeesByManager();
             runEmployeeTracker();
         } else if (selection === "Add an employee") {
+            console.clear();
             updateJobTitles();
             inquirer.prompt([
             {
@@ -101,12 +105,12 @@ function runEmployeeTracker() {
                 choices: ["Timothy Williams", "Amber Smith", "Andrew Phillips", "Laurel Davis", "Joseph Johnson", "Jamie Miller"]
             }
           ]).then((response) => {
-            // let roleID = orm.jobTitles.indexOf(response, title) + 1;
             orm.addAnEmployee(response.firstName, response.lastName, response.role, response.manager);
             runEmployeeTracker();
             }) 
           
         } else if (selection === "Remove an employee") {
+            console.clear();
             updateEmployeesArray()
             inquirer.prompt([
                 {
@@ -120,11 +124,12 @@ function runEmployeeTracker() {
                 })
 
         } else if (selection === "Update an employee's role") {
+            console.clear();
             updateEmployeesArray();
             inquirer.prompt([
             {
                 name: "employee",
-                message: "Which employee would you like to update by ID?",
+                message: "Which employee would you like to update by ID?\n",
                 type: "input",
             },
             {
@@ -139,11 +144,12 @@ function runEmployeeTracker() {
             })
 
         } else if (selection === "Update an employee's manager") {
+            console.clear();
             updateEmployeesArray();
             inquirer.prompt([
             {
                 name: "employee",
-                message: "Which employee's manager would you like to update by ID?",
+                message: "Which employee's manager would you like to update by ID?\n",
                 type: "input",
             },
             {
@@ -155,8 +161,9 @@ function runEmployeeTracker() {
             orm.updateManager(response.employee, response.manager_id);
             runEmployeeTracker();
             })
-            
+
         } else if (selection === "View all roles") {
+            console.clear();
             orm.viewRoles();
             runEmployeeTracker();
         }
