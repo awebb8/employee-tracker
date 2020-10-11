@@ -10,7 +10,7 @@ const orm = {
             INNER JOIN department ON role.department_id = department.id;`,
             (err, data) => {
               if (err) throw err;
-              console.log("\n");
+              console.log("\n\n\n");
               console.table(data);
             }
     )},
@@ -22,6 +22,7 @@ const orm = {
             INNER JOIN department ON role.department_id = department.id;`,
             (err, data) => {
               if (err) throw err;
+              console.log("\n\n\n");
               console.table(data);
             }
     )},
@@ -37,6 +38,7 @@ const orm = {
             ORDER by employee.manager_id;`,
             (err, data) => {
               if (err) throw err;
+              console.log("\n\n\n");
               console.table(data);
             }
     )},
@@ -48,6 +50,7 @@ const orm = {
 
         connection.query (queryOne, [firstName, lastName, 1, 1], (err, data) => {
                 if (err) throw err;
+                console.log("\n\n\n");
                 console.table(data);
               });
     },
@@ -58,6 +61,7 @@ const orm = {
         
         connection.query(queryOne, [employee], (err, data) => {
             if (err) throw err;
+            console.log("\n\n\n");
             console.table(data);
             
         }
@@ -71,6 +75,7 @@ const orm = {
         
         connection.query(queryOne, [role, employee], (err, data) => {
             if (err) throw err;
+            console.log("\n\n\n");
             console.table(data);
         }
         );
